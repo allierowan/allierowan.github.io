@@ -7,7 +7,8 @@ var _ = require('lodash');
 // make the api requests
 
 var respPromises = routes.map(function(route) {
-  var coords = route["coordinates"].join(';');
+  var coords = route["coordinates"];
+  console.log(coords.split(';')[0].split(',').map(coord => parseFloat(coord)));
 
   var reqURL = base_url + coords + ".json";
   var queryParams = {access_token: 'pk.eyJ1IjoiMWVjNSIsImEiOiJjaWsxaHF2emwwM2E0dWdtMHo4d21uaXI5In0.LLdudT0iuSkOYb00l8eEaA', overview: 'full', geometries: 'geojson', steps: true, exclude: 'ferry'};
@@ -21,7 +22,7 @@ var respPromises = routes.map(function(route) {
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: route["coordinates"][0]
+            coordinates: coords.split(';')[0].split(',').map(coord => parseFloat(coord))
           },
           properties: {
             from: route['from_name'],
@@ -32,7 +33,7 @@ var respPromises = routes.map(function(route) {
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: route["coordinates"][1]
+            coordinates: coords.split(';')[1].split(',').map(coord => parseFloat(coord))
           },
           properties: {
             to: route['to_name'],
@@ -58,36 +59,36 @@ var respPromises = routes.map(function(route) {
 
 Promise.all(respPromises).then(responses => {
   console.log(responses.length);
-  // console.log(JSON.stringify(responses[0]));
-  var points = _.flatten(responses.map(response => {
-    return response.features.filter(feature => {
-      return feature.geometry.type == 'Point';
-    });
-  }));
-  var lines = _.flatten(responses.map(response => {
-    return response.features.filter(feature => {
-      return feature.geometry.type == 'LineString';
-    });
-  }));
+  console.log(JSON.stringify(responses[0]));
+  // var points = _.flatten(responses.map(response => {
+  //   return response.features.filter(feature => {
+  //     return feature.geometry.type == 'Point';
+  //   });
+  // }));
+  // var lines = _.flatten(responses.map(response => {
+  //   return response.features.filter(feature => {
+  //     return feature.geometry.type == 'LineString';
+  //   });
+  // }));
 
-  var pointsCollection = {
-    type: 'FeatureCollection',
-    features: points
-  }
-
-  var linesCollection = {
-    type: 'FeatureCollection',
-    features: lines
-  }
-
-  var features = {
-    type: 'FeatureCollection',
-    features: points.concat(lines)
-  }
+  // var pointsCollection = {
+  //   type: 'FeatureCollection',
+  //   features: points
+  // }
+  //
+  // var linesCollection = {
+  //   type: 'FeatureCollection',
+  //   features: lines
+  // }
+  //
+  // var features = {
+  //   type: 'FeatureCollection',
+  //   features: points.concat(lines)
+  // }
 
   // fs.writeFileSync('./points.json', JSON.stringify(pointsCollection, null, 4));
   // fs.writeFileSync('./lines.json', JSON.stringify(linesCollection, null, 4));
-  fs.writeFileSync('./features.json', JSON.stringify(features));
+  fs.writeFileSync('./features.json', JSON.stringify(responses));
 
 }).catch(err => {
   console.error(err);

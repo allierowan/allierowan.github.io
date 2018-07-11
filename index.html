@@ -5,7 +5,7 @@
 </head>
 
 <body>
-  <div id='list' style='width: 30%; height: 100%; float: left'>
+  <div id='list' style='width: 30%; height: 100%; float: left; overflow:hidden; overflow-y:scroll;'>
     <script>
       var marker_one = new mapboxgl.Marker();
       var marker_two = new mapboxgl.Marker();
@@ -29,7 +29,11 @@
                   .setPopup(popup)
                   .addTo(map);
           });
+          map.setZoom(map.getZoom());
+          console.log(map.getZoom());
+          map.setCenter(feature['features'][0].geometry.coordinates);
         });
+
         document.getElementById("list").appendChild(node);
       });
     </script>

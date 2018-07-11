@@ -57,14 +57,6 @@
          }
         });
 
-        map.addSource('points', {
-          type: 'geojson',
-          data: {
-             "type": "FeatureCollection",
-             "features": []
-         }
-        });
-
         map.addLayer({
           "id": "lines",
           "type": "line",
@@ -78,6 +70,25 @@
               "line-width": 6
           }
       });
+
+      map.addLayer({
+        "id": "bike_lanes",
+        "type": "line",
+        "source": {
+            type: 'vector',
+            url: 'mapbox://mapbox.mapbox-streets-v8'
+        },
+        "source-layer": "road",
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#ff69b4",
+            "line-width": 2
+        },
+        "filter": ["in", "bike_lane", "yes", "right", "left"]
+    });
   });
   </script>
 </body>

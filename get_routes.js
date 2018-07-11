@@ -11,7 +11,7 @@ var respPromises = routes.map(function(route) {
   console.log(coords.split(';')[0].split(',').map(coord => parseFloat(coord)));
 
   var reqURL = base_url + coords + ".json";
-  var queryParams = {access_token: 'pk.eyJ1IjoiMWVjNSIsImEiOiJjaWsxaHF2emwwM2E0dWdtMHo4d21uaXI5In0.LLdudT0iuSkOYb00l8eEaA', overview: 'full', geometries: 'geojson', steps: true, exclude: 'ferry'};
+  var queryParams = {access_token: 'pk.eyJ1IjoiYWxsaWVyb3dhbiIsImEiOiJjaXdzMTQ5ZDIxMHhrMnRxb2l5dHdpcXo5In0.SjrzU9JK207wiTfbTr31Rw', overview: 'full', geometries: 'geojson', steps: true, exclude: 'ferry'};
 
   return got(reqURL, { json: true, query: queryParams }).then(response => {
     var routeGeoJson = response.body['routes'][0]['geometry'];

@@ -61,12 +61,12 @@ async function writeMarkdown() {
       var stationsTooFar = true;
       var sfStations;
       while (stationsTooFar) {
-        stations = getRandomStations(sf);
-        foundCloseStations = await distanceWithinThreeMiles(stations.A, stations.B);
+        sfStations = getRandomStations(sf);
+        foundCloseStations = await distanceWithinThreeMiles(sfStations.A, sfStations.B);
         console.log('distance withint three miles: ' + foundCloseStations);
         stationsTooFar = !foundCloseStations;
       }
-      sf_routes.push({A: stations.A, B: stations.B});
+      sf_routes.push({A: sfStations.A, B: sfStations.B});
 
       stationsTooFar = true;
       var chicagoStations;
@@ -75,7 +75,7 @@ async function writeMarkdown() {
         foundCloseStations = await distanceWithinThreeMiles(chicagoStations.A, chicagoStations.B);
         stationsTooFar = !foundCloseStations;
       }
-      chicago_routes.push({A: stations.A, B: stations.B});
+      chicago_routes.push({A: chicagoStations.A, B: chicagoStations.B});
 
       stationsTooFar = true;
       var nycStations;
@@ -84,7 +84,7 @@ async function writeMarkdown() {
         foundCloseStations = await distanceWithinThreeMiles(nycStations.A, nycStations.B);
         stationsTooFar = !foundCloseStations;
       }
-      nyc_routes.push({A: stations.A, B: stations.B});
+      nyc_routes.push({A: nycStations.A, B: nycStations.B});
   }
 
 

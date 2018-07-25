@@ -1,0 +1,94 @@
+<head>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.css' rel='stylesheet' />
+  <script type="text/javascript" src="sources/valhalla.js"></script>
+</head>
+
+<body>
+  <div id='list' style='width: 30%; height: 100%; float: left; overflow:hidden; overflow-y:scroll;'>
+    <script>
+      var marker_one = new mapboxgl.Marker();
+      var marker_two = new mapboxgl.Marker();
+      feature_collection.forEach(feature => {
+        var node = document.createElement("LI");
+        var textnode = document.createTextNode("from: " + feature['features'][0]['properties']['from'] + ", to: " + feature['features'][1]['properties']['to']);
+        node.appendChild(textnode);
+        node.setAttribute("style", "cursor:pointer");
+        node.addEventListener("click", function(){
+          map.getSource('lines').setData(feature);
+          [feature['features'][0], feature['features'][1]].forEach((marker, index) => {
+            // create a DOM element for the marker
+              var popup = new mapboxgl.Popup({ offset: 0 })
+                .setText(marker.properties.to || marker.properties.from);
+
+              var myMarker;
+              index === 1? myMarker = marker_one: myMarker = marker_two;
+              // add marker to map
+              myMarker
+                  .setLngLat(marker.geometry.coordinates)
+                  .setPopup(popup)
+                  .addTo(map);
+          });
+          map.setZoom(map.getZoom());
+          console.log(map.getZoom());
+          map.setCenter(feature['features'][0].geometry.coordinates);
+        });
+
+        document.getElementById("list").appendChild(node);
+      });
+    </script>
+  </div>
+  <div id='map' style='width: 70%; height: 100%;'></div>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYWxsaWVyb3dhbiIsImEiOiJjaXdzMTQ5ZDIxMHhrMnRxb2l5dHdpcXo5In0.SjrzU9JK207wiTfbTr31Rw';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/satellite-streets-v10',
+        center: [-122.4356498,37.772406],
+        zoom: 9
+    });
+
+    map.on('load', function() {
+        map.addSource('lines', {
+          type: 'geojson',
+          data: {
+             "type": "FeatureCollection",
+             "features": []
+         }
+        });
+
+        map.addLayer({
+          "id": "lines",
+          "type": "line",
+          "source": "lines",
+          "layout": {
+              "line-join": "round",
+              "line-cap": "round"
+          },
+          "paint": {
+              "line-color": "#f2e782",
+              "line-width": 6
+          }
+      });
+
+      map.addLayer({
+        "id": "bike_lanes",
+        "type": "line",
+        "source": {
+            type: 'vector',
+            url: 'mapbox://mapbox.mapbox-streets-v8'
+        },
+        "source-layer": "road",
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#ff69b4",
+            "line-width": 2
+        },
+        "filter": ["in", "bike_lane", "yes", "right", "left"]
+    });
+  });
+  </script>
+</body>

@@ -11,34 +11,36 @@ var q = d3.queue(1);
 // read featurecollection with v5 responses
 var new_features = features.routes.map((route) => {
 
-  var coordinates = [{ "lat":route.features[0].geometry.coordinates[1], "lon":route.features[0].geometry.coordinates[0] },
-                     { "lat":route.features[1].geometry.coordinates[1], "lon":route.features[1].geometry.coordinates[0] } ];
+  var coordinates = [{ "lat":route.features[0].geometry.coordinates[1], "lon":route.features[0].geometry.coordinates[0],'minimum_reachability': 50 },
+                     { "lat":route.features[1].geometry.coordinates[1], "lon":route.features[1].geometry.coordinates[0],'minimum_reachability': 50 } ];
 
   var routingOptions = {
-    locations: coordinates,
-    costing: 'bicycle',
-    costing_options: {
-      bicycle: {
-        use_ferry: 0
+    'locations': coordinates,
+    'costing': 'bicycle',
+    'costing_options': {
+      'bicycle': {
+        'use_ferry': 0
       }
     }
   };
 
 
   // replace v5 routes with valhalla routes
-    q.defer(getRoute, 'https://api.mapbox.com/valhalla/v1/route?json=' + escape(JSON.stringify(routingOptions)) + '&access_token=pk.eyJ1IjoiY2hhdXBvdyIsImEiOiJZX29XRnNFIn0.5eui1ITuIWOxZdPyF0kWTA',
+    q.defer(getRoute, 'https://api.mapbox.com/valhalla/v1/route?json=', routingOptions, '&access_token=pk.eyJ1IjoiY2hhdXBvdyIsImEiOiJZX29XRnNFIn0.5eui1ITuIWOxZdPyF0kWTA',
       (linestring) => {
-        console.log('replacing: ')
-        console.log('  ' + route.features[2].geometry.coordinates)
-        console.log('with: ')
-        console.log('  ' + linestring)
-        route.features[2].geometry['coordinates'] = linestring
-        console.log('new: ')
-        console.log('  ' + route.features[2].geometry.coordinates)
-        console.log('done');
+        // console.log('replacing: ')
+        // console.log('  ' + route.features[2].geometry.coordinates)
+        // console.log('with: ')
+        // console.log('  ' + linestring)
+        // route.features[2].geometry['coordinates'] = linestring
+        // console.log('new: ')
+        // console.log('  ' + route.features[2].geometry.coordinates)
+        // console.log('done');
       });
 
-  function getRoute(url, cb, d3_callback) {
+  function getRoute(endpoint, routingOptions, access_token, cb, d3_callback) {
+
+    url = endpoint + escape(JSON.stringify(routingOptions)) + access_token;
     https.get(url, function(res) {
       let body = '';
 
@@ -55,7 +57,17 @@ var new_features = features.routes.map((route) => {
           return d3_callback();
         }
         else {
-          console.log('NO ROUTE FOUND')
+          console.log('-------------')
+          console.log()
+          console.log('NO ROUTE FOUND:')
+          console.log()
+          console.log('URL: ')
+          console.log(url)
+          console.log()
+          console.log('Options:')
+          console.log(routingOptions)
+          console.log()
+          console.log()
           cb([[]]);
           return d3_callback();
         }
@@ -73,11 +85,10 @@ var new_features = features.routes.map((route) => {
 
 q.awaitAll(function(error) {
   if (error) throw error;
-  fs.writeFileSync('./sources/chau.js', JSON.stringify(new_features));
+  fs.writeFileSync('./sources/valhalla.js', JSON.stringify(new_features));
   console.log('DONE');
 });
 
-fs.writeFileSync('./sources/chau.js', JSON.stringify(new_features));
 
 
 
@@ -127,7 +138,7 @@ decodePolyline = function(str, precision) {
 
         coordinates.push([lng / factor, lat / factor]);
     }
-    console.log(coordinates);
+    // console.log(coordinates);
 
     return coordinates;
 };
